@@ -1,3 +1,5 @@
+from typing import List
+
 from extensions import db
 
 
@@ -23,4 +25,11 @@ class Pokemon(db.Model):
             f' and belongs to {species_name}'
         )
         db.session.add(self)
+        db.session.commit()
+
+    def add_abilities(self, abilities: List[Ability]):
+        for ability in abilities:
+            ability.pokemon_id = self.id
+            self.abilities.append(ability)
+
         db.session.commit()
