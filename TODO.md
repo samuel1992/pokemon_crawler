@@ -1,0 +1,13 @@
+# Pokemon crawler
+
+- make the abstraction for pokemon data:
+  - model
+  - schema (json serialization in/out)
+
+- make a simple abstraction for the pokemon api requests (lib/pokemon_api)
+
+- make a service to call the pokemon_api lib, retrieve the pokemon data and save/update it on database
+
+- make an api laywer to show all the pokemon data we have stored
+
+- make a celery periodic task to call the pokemon service

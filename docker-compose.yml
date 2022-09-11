@@ -4,7 +4,7 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=pokemon
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   web:
@@ -16,3 +16,8 @@ services:
       - "8080:8080"
     depends_on:
       - db
+    environment:
+      - DB_NAME=pokemon
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
