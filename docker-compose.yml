@@ -7,6 +7,8 @@ services:
       - POSTGRES_DB=pokemon
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
   web:
     build: .
     command: tail -f /dev/null
@@ -20,4 +22,5 @@ services:
       - DB_NAME=pokemon
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - DB_HOST=db
+      - DB_HOST=localhost
+      #- DB_HOST=db

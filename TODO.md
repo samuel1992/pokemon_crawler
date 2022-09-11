@@ -1,8 +1,8 @@
 # Pokemon crawler
 
-- make the abstraction for pokemon data:
-  - model
-  - schema (json serialization in/out)
+- make the abstraction for pokemon data: -DONE
+  - model -DONE
+  - schema (json serialization in/out) -DONE
 
 - make a simple abstraction for the pokemon api requests (lib/pokemon_api)
 
