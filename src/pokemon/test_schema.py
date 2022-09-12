@@ -1,7 +1,7 @@
 from .schema import AbilitySchema, PokemonSchema
 from .model import Pokemon, Ability
 
-from fixtures import db, app
+from fixtures import db
 
 
 def teste_create_a_ability_schema():

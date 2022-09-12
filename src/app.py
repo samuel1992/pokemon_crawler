@@ -1,17 +1,14 @@
 from flask import Flask
 
-from extensions import db
-from config import Config, TestingConfig
+from extensions import db, Base, engine
+from config import Config
 
 
-def create_app(testing=False):
+def create_app():
     flask_app = Flask(__name__)
 
-    if testing:
-        flask_app.config.from_object(TestingConfig)
-    else:
-        flask_app.config.from_object(Config)
+    Base.metadata.create_all(bind=engine)
 
-    db.init_app(flask_app)
+    flask_app.config.from_object(Config)
 
     return flask_app

@@ -1,26 +1,22 @@
+import os
 import pytest
 
-from app import create_app
-
-app = create_app()
-
 
 @pytest.fixture
-def app():
-    return create_app(testing=True)
+def db():
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from extensions import Base
 
+    SQLALCHEMY_DATABASE_URL = f'sqlite:///{os.path.abspath(os.path.dirname(__file__))}/app-test.db'
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
-@pytest.fixture
-def client(app):
-    return app.test_client()
+    db = SessionLocal()
 
+    yield db
 
-@pytest.fixture
-def db(app):
-    from extensions import db
-
-    with app.app_context():
-        db.create_all()
-        yield db
-        db.drop_all()
-        db.session.commit()
+    Base.metadata.drop_all(bind=engine)
+    db.commit()
