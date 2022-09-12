@@ -6,12 +6,17 @@ app = create_app()
 
 
 @pytest.fixture
-def client():
+def app():
+    return create_app(testing=True)
+
+
+@pytest.fixture
+def client(app):
     return app.test_client()
 
 
 @pytest.fixture
-def db():
+def db(app):
     from extensions import db
 
     with app.app_context():

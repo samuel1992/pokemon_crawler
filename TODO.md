@@ -4,9 +4,9 @@
   - model -DONE
   - schema (json serialization in/out) -DONE
 
-- make a simple abstraction for the pokemon api requests (lib/pokemon_api)
+- make a simple abstraction for the pokemon api requests (lib/pokemon_api) -DONE
 
-- make a service to call the pokemon_api lib, retrieve the pokemon data and save/update it on database
+- make a service to call the pokemon_api lib, retrieve the pokemon data and save/update it on database -DONE
 
 - make an api laywer to show all the pokemon data we have stored
 

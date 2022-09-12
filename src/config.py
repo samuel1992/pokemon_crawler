@@ -10,3 +10,7 @@ class Config():
     PORT = '8080'
     SQLALCHEMY_DATABASE_URI = f'postgresql+psycopg2://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}/{DATABASE_NAME}'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+
+class TestingConfig(Config):
+    SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.abspath(os.path.dirname(__file__))}/app-test.db'
