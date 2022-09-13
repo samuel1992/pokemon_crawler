@@ -58,6 +58,37 @@ def test_fetch_new_abilities_and_save_it(mock_get_pokemon, db):
     assert ability.id == 65
 
 
+@patch('lib.pokemon_api.PokemonApi.get_pokemon')
+def test_fetch_already_existent_ability_but_updates_it(mock_get_pokemon, db):
+    pokemon = Pokemon(id=1, name='bulbasaur')
+    ability = Ability(id=1, pokemon_id=pokemon.id, name='test 1')
+    pokemon.add_abilities([ability])
+    db.add(pokemon)
+    db.commit()
+
+    mock_get_pokemon.return_value = {
+        "abilities": [
+            {
+                "ability": {
+                    "name": "test 2",
+                    "url": f"https://pokeapi.co/api/v2/ability/{ability.id}/"
+                },
+                "is_hidden": False,
+                "slot": 1
+            }
+        ]
+    }
+
+    assert ability.name == 'test 1'
+
+    PokemonService(db).fetch_new_abilities(pokemon.id)
+
+    pokemon = db.query(Pokemon).first()
+    ability = pokemon.abilities[0]
+
+    assert ability.name == 'test 2'
+
+
 def test_get_last_updated_pokemons(db):
     pokemon = Pokemon(id=1, name='bulbasaur')
     db.add(pokemon)
