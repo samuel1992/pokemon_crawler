@@ -1,3 +1,5 @@
+import os
+
 from celery.utils.log import get_task_logger
 
 from extensions import Base, engine
@@ -13,7 +15,7 @@ logger = get_task_logger(__name__)
 app.conf.beat_schedule = {
     'get_new_pokemons': {
         'task': 'get_new_pokemons',
-        'schedule': 90.0
+        'schedule': int(os.environ.get('CRAWLER_INTERVAL'))
     },
 }
 app.conf.timezone = 'UTC'
@@ -31,7 +33,7 @@ def get_new_abilities(pokemon_id: int):
 def get_new_pokemons():
     from pokemon.model import Pokemon, Ability
     Base.metadata.create_all(bind=engine)
-    service = PokemonService
+    service = PokemonService()
     service.fetch_new_pokemons()
 
     logger.info(f'Total pokemons in db: {service.pokemon_total()}')

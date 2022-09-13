@@ -68,3 +68,7 @@ class PokemonService:
                 self._db.commit()
             finally:
                 self._db.close()
+
+    def get_all_pokemons(self):
+        return [PokemonSchema.from_instance(i)
+                for i in self._db.query(Pokemon).all()]
