@@ -22,7 +22,7 @@ services:
       - DB_PASSWORD=postgres
       - DB_HOST=db
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - CRAWLER_INTERVAL=90
+      - CRAWLER_INTERVAL=30
 
   celery_worker:
     build: .
@@ -42,9 +42,9 @@ services:
 
   web:
     build: .
-    command: 'tail -f /dev/null'
+    command: 'python app.py'
     volumes:
-      - .:/app
+      - ./src/:/app
     ports:
       - "8080:8080"
     depends_on:
