@@ -40,7 +40,7 @@ GET http://localhost:8080/pokemons
 ```
 
 # Running the tests
-Mainly the project has unittests but some of the tests also validates some database operations using Pytest fixtures for that.
+Mainly the project has unittests but some of the tests also validates database operations using Pytest fixtures for that.
 ```
 docker-compose run web pytest
 ```
