@@ -7,11 +7,40 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5432:5432"
+
+  celery_beat:
+    build: .
+    command: 'celery -A tasks.tasks.app beat -l INFO'
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./src/:/app
+    environment:
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
+  celery_worker:
+    build: .
+    command: 'celery -A tasks.tasks.app worker -l INFO'
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./src/:/app
+    environment:
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
   web:
     build: .
-    command: tail -f /dev/null
+    command: 'tail -f /dev/null'
     volumes:
       - .:/app
     ports:
@@ -23,3 +52,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_HOST=db
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
+  redis:
+    image: redis:6-alpine
