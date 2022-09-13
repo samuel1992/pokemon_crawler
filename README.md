@@ -53,7 +53,7 @@ Good to know:
 - CRAWLER_INTERVAL=30 # Represents the interval that the crawler will take until run the next task to sync the pokemons with the api
 ```
 
-# More about it ..
+# More about it ...
 - It has two async tasks and the main job is to retrieve pokemons from the api and update their abilities. For that I use a service to not have to interact directly with
 the model.
 - I chose to use the SQLAlchemy lib instead of using the Flask-SQLAlchemy because even though the Flask foucused lib is "easier" sometimes you can get a little confuse
