@@ -54,8 +54,8 @@ Good to know:
 ```
 
 # More about it ...
-- It has two async tasks and the main job is to retrieve pokemons from the api and update their abilities. For that I use a service to not have to interact directly with
+- It has two async tasks; the main job is to retrieve pokemons from the api and update their abilities. For that, I use a service to not have to interact directly with
 the model.
-- I chose to use the SQLAlchemy lib instead of using the Flask-SQLAlchemy because even though the Flask foucused lib is "easier" sometimes you can get a little confuse
-  with the whole app context involving the db layer. So this way the database layer is disatached from the flask app and we can operate it freely from an external task,
+- I chose to use the SQLAlchemy lib instead of using the Flask-SQLAlchemy because even though the Flask-focused lib is "easier" sometimes you can get a little confused
+  with the whole app context involving the DB layer. So this way the database layer is detached from the flask app and we can operate it freely from an external task,
 etc.
