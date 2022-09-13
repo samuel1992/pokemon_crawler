@@ -1,10 +1,13 @@
+from datetime import datetime
+
 from fixtures import db
 
 from .model import Pokemon, Ability
 
 
 def test_create_a_pokemon(db):
-    pokemon = Pokemon(id=1, name='test name')
+    now = datetime.now()
+    pokemon = Pokemon(id=1, name='test name', last_update=now)
 
     db.add(pokemon)
     db.commit()
@@ -12,6 +15,7 @@ def test_create_a_pokemon(db):
     first_pokemon = db.query(Pokemon).first()
 
     assert first_pokemon is not None
+    assert first_pokemon.last_update == now
 
 
 def test_create_an_ability(db):
