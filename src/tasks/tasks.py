@@ -21,18 +21,20 @@ app.conf.timezone = 'UTC'
 
 @app.task
 def get_new_abilities(pokemon_id: int):
-    PokemonService.fetch_new_abilities(pokemon_id)
+    service = PokemonService()
+    service.fetch_new_abilities(pokemon_id)
 
-    logger.info(f'Total abilities in db: {PokemonService.ability_total()}')
+    logger.info(f'Total abilities in db: {service.ability_total()}')
 
 
 @app.task(name='get_new_pokemons')
 def get_new_pokemons():
     from pokemon.model import Pokemon, Ability
     Base.metadata.create_all(bind=engine)
-    PokemonService.fetch_new_pokemons()
+    service = PokemonService
+    service.fetch_new_pokemons()
 
-    logger.info(f'Total pokemons in db: {PokemonService.pokemon_total()}')
+    logger.info(f'Total pokemons in db: {service.pokemon_total()}')
 
-    for pokemon_id in PokemonService.last_updated_pokemons(10):
+    for pokemon_id in service.last_updated_pokemons(10):
         get_new_abilities.delay(pokemon_id)

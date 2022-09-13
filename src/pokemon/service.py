@@ -12,40 +12,40 @@ from .schema import PokemonSchema, AbilitySchema
 
 
 class PokemonService:
-    def pokemon_total():
-        return db.query(Pokemon).count()
+    def __init__(self, db_session=None):
+        self._db = db_session or db
 
-    def ability_total():
-        return db.query(Ability).count()
+    def pokemon_total(self):
+        return self._db.query(Pokemon).count()
 
-    @staticmethod
-    def last_updated_pokemons(amount: int) -> List[int]:
-        query = db.query(Pokemon.id).order_by(
+    def ability_total(self):
+        return self._db.query(Ability).count()
+
+    def last_updated_pokemons(self, amount: int) -> List[int]:
+        query = self._db.query(Pokemon.id).order_by(
             Pokemon.last_update.desc()
         ).limit(amount)
         return [i[0] for i in query.all()]
 
-    @staticmethod
-    def fetch_new_pokemons():
+    def fetch_new_pokemons(self):
         response = PokemonApi.get_all_pokemons()
         pokemons = [PokemonSchema.from_dict(i).to_instance()
-                    for i in response['results']]
+                    for i in response]
 
         for pokemon in pokemons:
             try:
-                db.add(pokemon)
-                db.commit()
+                self._db.add(pokemon)
+                self._db.commit()
             except sqlalchemy.exc.IntegrityError:
-                db.rollback()
+                self._db.rollback()
             finally:
-                db.close()
+                self._db.close()
 
-    @staticmethod
-    def fetch_new_abilities(pokemon_id: int):
-        pokemon = db.query(Pokemon).get(pokemon_id)
+    def fetch_new_abilities(self, pokemon_id: int):
+        pokemon = self._db.query(Pokemon).get(pokemon_id)
         pokemon.last_update = datetime.now()
-        db.add(pokemon)
-        db.commit()
+        self._db.add(pokemon)
+        self._db.commit()
 
         response = PokemonApi.get_pokemon(pokemon.id)
 
@@ -58,13 +58,13 @@ class PokemonService:
 
         for ability in abilities:
             try:
-                db.add(ability)
-                db.commit()
+                self._db.add(ability)
+                self._db.commit()
             except sqlalchemy.exc.IntegrityError:
-                db.rollback()
-                db.query(Ability).filter(
+                self._db.rollback()
+                self._db.query(Ability).filter(
                     Ability.id == ability.id
                 ).update(dict(name=ability.name))
-                db.commit()
+                self._db.commit()
             finally:
-                db.close()
+                self._db.close()

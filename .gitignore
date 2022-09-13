@@ -69,3 +69,5 @@ __pypackages__/
 .venv
 
 celerybeat-schedule
+
+app-test.db

@@ -15,4 +15,4 @@ class PokemonApi:
     def get_all_pokemons(cls, limit: int = 1000000, offset: int = 0):
         params = {'limit': limit, 'offset': offset}
         response = requests.get(f'{BASE_URL}/{cls._endpoint}', params=params)
-        return response.json()
+        return response.json().get('results', [])
