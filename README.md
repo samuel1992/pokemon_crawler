@@ -47,7 +47,8 @@ docker-compose run web pytest
 
 # Configuration
 I didn't group all the configs in a single place as the ideal but basically everything is using environment variables that you can find in the `docker-compose.yml` file.
-Some util variables:
+
+Good to know:
 ```
 - CRAWLER_INTERVAL=30 # Represents the interval that the crawler will take until run the next task to sync the pokemons with the api
 ```
