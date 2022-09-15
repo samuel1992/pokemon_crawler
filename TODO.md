@@ -8,6 +8,6 @@
 
 - make a service to call the pokemon_api lib, retrieve the pokemon data and save/update it on database -DONE
 
-- make an api laywer to show all the pokemon data we have stored
+- make an api laywer to show all the pokemon data we have stored -DONE
 
-- make a celery periodic task to call the pokemon service
+- make a celery periodic task to call the pokemon service -DONE
