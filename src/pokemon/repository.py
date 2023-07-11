@@ -30,6 +30,13 @@ class PokemonRepository:
 
         return self.get_by_id(id)
 
+    def update(self, pokemon_dto: PokemonDTO) -> Optional[PokemonDTO]:
+        if pokemon_dto.id is None:
+            return None
+
+        self.storage.update(self.entity, pokemon_dto.to_dict())
+        return self.get_by_id(pokemon_dto.id)
+
 
 class AbilityRepository:
     def __init__(self, storage, entity):

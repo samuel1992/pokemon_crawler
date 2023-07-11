@@ -50,6 +50,13 @@ class PokemonRepositoryTest(TestCase):
 
         assert pokemon_dto == self.repository.create(pokemon_dto)
 
+    def test_update(self):
+        pokemon = Pokemon(id=1, name='some name', last_update=now())
+        pokemon_dto = PokemonDTO.from_instance(pokemon)
+        self.repository.storage.get_by_id.return_value = pokemon_dto
+
+        assert pokemon_dto == self.repository.update(pokemon_dto)
+
     def test_try_to_create_duplicate(self):
         pokemon = Pokemon(id=1, name='some name', last_update=now())
         pokemon_dto = PokemonDTO.from_instance(pokemon)
@@ -75,6 +82,13 @@ class AbilityRepositoryTest(TestCase):
         self.repository.storage.get_by_id.return_value = ability
 
         assert ability_dto == self.repository.create(ability_dto)
+
+    def test_update(self):
+        ability = Ability(id=1, name='test ability 1')
+        ability_dto = AbilityDTO.from_instance(ability)
+        self.repository.storage.get_by_id.return_value = ability_dto
+
+        assert ability_dto == self.repository.update(ability_dto)
 
     def test_try_to_create_duplicate(self):
         ability = Ability(id=1, name='test ability 1')
