@@ -5,7 +5,7 @@ from datetime import datetime
 from fixtures import db
 
 from .model import Pokemon
-from .storage import PostgresStorage, IntegrityError
+from .storage import PostgresStorage
 
 
 def test_create_a_pokemon(db):
@@ -35,8 +35,7 @@ def test_create_a_duplicated_pokemon(db):
 
     duplicated_pokemon = Pokemon(id=1, name='new pokemon with used id', last_update=now)
 
-    with pytest.raises(IntegrityError):
-        storage.create(duplicated_pokemon)
+    assert storage.create(duplicated_pokemon) is None
 
 
 def test_update_a_pokemon(db):

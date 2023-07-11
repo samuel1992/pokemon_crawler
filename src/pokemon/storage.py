@@ -5,13 +5,9 @@ import sqlalchemy
 from sqlalchemy import desc
 
 
-class IntegrityError(Exception):
-    pass
-
-
 class Storage(ABC):
     @abstractmethod
-    def create(self, item) -> int:
+    def create(self, item) -> Optional[int]:
         pass
 
     @abstractmethod
@@ -41,14 +37,14 @@ class PostgresStorage(Storage):
     def __init__(self, db_engine):
         self.db_engine = db_engine
 
-    def create(self, item) -> int:
+    def create(self, item) -> Optional[int]:
         try:
             self.db_engine.add(item)
             self.db_engine.commit()
             self.db_engine.flush()
             item_id = item.id
         except sqlalchemy.exc.IntegrityError:
-            raise IntegrityError()
+            return None
         finally:
             self.db_engine.close()
 

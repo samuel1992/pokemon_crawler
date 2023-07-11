@@ -3,6 +3,10 @@ from typing import List, Optional
 from .dto import AbilityDTO, PokemonDTO
 
 
+class IntegrityError(Exception):
+    pass
+
+
 class PokemonRepository:
     def __init__(self, storage, entity):
         self.storage = storage
@@ -21,6 +25,9 @@ class PokemonRepository:
 
     def create(self, pokemon_dto: PokemonDTO) -> PokemonDTO:
         id = self.storage.create(pokemon_dto.to_instance)
+        if id is None:
+            raise IntegrityError()
+
         return self.get_by_id(id)
 
 
@@ -37,4 +44,15 @@ class AbilityRepository:
         return self.storage.count(self.entity)
 
     def create(self, ability_dto: AbilityDTO) -> AbilityDTO:
-        pass
+        id = self.storage.create(ability_dto.to_instance)
+        if id is None:
+            raise IntegrityError()
+
+        return self.get_by_id(id)
+
+    def update(self, ability_dto: AbilityDTO) -> Optional[AbilityDTO]:
+        if ability_dto.id is None:
+            return None
+
+        self.storage.update(self.entity, ability_dto.to_dict())
+        return self.get_by_id(ability_dto.id)
