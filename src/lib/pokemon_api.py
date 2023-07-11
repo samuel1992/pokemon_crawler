@@ -3,6 +3,8 @@ import requests
 BASE_URL = 'https://pokeapi.co/api/v2'
 
 
+# TODO: could improve the response handling here
+# maybe having a response class and handling the http codes better
 class PokemonApi:
     _endpoint = 'pokemon'
 

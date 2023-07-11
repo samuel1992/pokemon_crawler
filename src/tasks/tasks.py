@@ -15,6 +15,8 @@ logger = get_task_logger(__name__)
 app.conf.beat_schedule = {
     'get_new_pokemons': {
         'task': 'get_new_pokemons',
+        # TODO: improve the configuration abstraction, instead of calling the
+        # os lib direct here. Could use the flask config feature or something
         'schedule': int(os.environ.get('CRAWLER_INTERVAL'))
     },
 }
@@ -29,6 +31,8 @@ def get_new_abilities(pokemon_id: int):
     logger.info(f'Total abilities in db: {service.ability_total()}')
 
 
+# TODO: instead of calling all pokemons I could have some paralel tasks to get
+# pokemons periodic
 @app.task(name='get_new_pokemons')
 def get_new_pokemons():
     from pokemon.model import Pokemon, Ability

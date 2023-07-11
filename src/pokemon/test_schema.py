@@ -4,6 +4,8 @@ from .model import Pokemon, Ability
 from fixtures import db
 
 
+# TODO: a lot of code duplication in the tests cases. Could use at leas some
+# factory to recreate the db instances
 def teste_create_a_ability_schema():
     ability_schema = AbilitySchema(id=1, name='test')
 
