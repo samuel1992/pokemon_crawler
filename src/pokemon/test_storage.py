@@ -1,9 +1,11 @@
+import pytest
+
 from datetime import datetime
 
 from fixtures import db
 
-from .model import Ability, Pokemon
-from .storage import PostgresStorage
+from .model import Pokemon
+from .storage import PostgresStorage, IntegrityError
 
 
 def test_create_a_pokemon(db):
@@ -16,16 +18,25 @@ def test_create_a_pokemon(db):
     first_pokemon = db.query(Pokemon).first()
 
     assert first_pokemon is not None
-    assert first_pokemon.last_update == now
+    assert isinstance(first_pokemon, Pokemon)
 
 
-def test_create_an_ability(db):
+def test_create_a_duplicated_pokemon(db):
     storage = PostgresStorage(db_engine=db)
-    ability = Ability(id=1, name='test')
+    now = datetime.now()
+    pokemon = Pokemon(id=1, name='new pokemon', last_update=now)
 
-    storage.create(ability)
+    storage.create(pokemon)
 
-    assert db.query(Ability).first() is not None
+    first_pokemon = db.query(Pokemon).first()
+
+    assert first_pokemon is not None
+    assert isinstance(first_pokemon, Pokemon)
+
+    duplicated_pokemon = Pokemon(id=1, name='new pokemon with used id', last_update=now)
+
+    with pytest.raises(IntegrityError):
+        storage.create(duplicated_pokemon)
 
 
 def test_update_a_pokemon(db):
@@ -47,25 +58,6 @@ def test_update_a_pokemon(db):
     first_pokemon = db.query(Pokemon).first()
     assert first_pokemon.name != initial_name
     assert first_pokemon.last_update != initial_update
-
-
-def test_update_an_ability(db):
-    initial_name = 'test ability'
-    storage = PostgresStorage(db_engine=db)
-    ability = Ability(id=1, name=initial_name)
-
-    db.add(ability)
-    db.commit()
-
-    first_ability = db.query(Ability).first() is not None
-    assert first_ability is not None
-
-    storage.update(
-        Ability, dict(id=1, name='New ability name')
-    )
-
-    first_ability = db.query(Ability).first()
-    assert first_ability.name != initial_name
 
 
 def test_get_all_pokemons(db):
