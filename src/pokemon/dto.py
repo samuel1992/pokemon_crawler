@@ -1,8 +1,8 @@
-from dataclasses import dataclass, asdict, field
-
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from typing import List, Optional
 
-from .model import Pokemon, Ability
+from .model import Ability, Pokemon
 
 
 @dataclass
@@ -44,6 +44,7 @@ class PokemonDTO(DTO):
     abilities: Optional[List[AbilityDTO]] = field(
         default_factory=lambda: []
     )
+    last_update: Optional[datetime]
 
     @classmethod
     def from_dict(cls, data: dict) -> 'PokemonDTO':
