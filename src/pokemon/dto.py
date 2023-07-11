@@ -13,8 +13,6 @@ class DTO:
 
 @dataclass
 class AbilityDTO(DTO):
-    instance_class = Ability
-
     id: Optional[int]
     name: str
     pokemon_id: Optional[int] = None
@@ -36,13 +34,11 @@ class AbilityDTO(DTO):
         )
 
     def to_instance(self):
-        return self.instance_class(**self.to_dict())
+        return Ability(**self.to_dict())
 
 
 @dataclass
 class PokemonDTO(DTO):
-    instance_class = Pokemon
-
     id: Optional[int]
     name: str
     abilities: Optional[List[AbilityDTO]] = field(
@@ -69,7 +65,7 @@ class PokemonDTO(DTO):
         )
 
     def to_instance(self):
-        abilities = [AbilityDTO.instance_class(**i.to_dict()) for i in self.abilities]
+        abilities = [Ability(**i.to_dict()) for i in self.abilities]
         pokemon_data = self.to_dict()
         pokemon_data['abilities'] = abilities
-        return self.instance_class(**pokemon_data)
+        return Pokemon(**pokemon_data)

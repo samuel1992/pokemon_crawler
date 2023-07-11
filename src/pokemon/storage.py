@@ -11,7 +11,7 @@ class IntegrityError(Exception):
 
 class Storage(ABC):
     @abstractmethod
-    def create(self, item):
+    def create(self, item) -> int:
         pass
 
     @abstractmethod
@@ -41,14 +41,18 @@ class PostgresStorage(Storage):
     def __init__(self, db_engine):
         self.db_engine = db_engine
 
-    def create(self, item):
+    def create(self, item) -> int:
         try:
             self.db_engine.add(item)
             self.db_engine.commit()
+            self.db_engine.flush()
+            item_id = item.id
         except sqlalchemy.exc.IntegrityError:
             raise IntegrityError()
         finally:
             self.db_engine.close()
+
+        return item_id
 
     def update(self, item_class, new_data: dict):
         item_id = new_data.get('id')
