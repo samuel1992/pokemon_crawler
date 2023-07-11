@@ -8,7 +8,7 @@ from lib.pokemon_api import PokemonApi
 from extensions import db
 
 from .model import Pokemon, Ability
-from .schema import PokemonSchema, AbilitySchema
+from .dto import PokemonDTO, AbilityDTO
 
 
 class PokemonService:
@@ -29,7 +29,7 @@ class PokemonService:
 
     def fetch_new_pokemons(self):
         response = PokemonApi.get_all_pokemons()
-        pokemons = [PokemonSchema.from_dict(i).to_instance()
+        pokemons = [PokemonDTO.from_dict(i).to_instance()
                     for i in response]
 
         for pokemon in pokemons:
@@ -51,7 +51,7 @@ class PokemonService:
 
         abilities = []
         for a in response['abilities']:
-            ability = AbilitySchema.from_dict(
+            ability = AbilityDTO.from_dict(
                 {**{'pokemon_id': pokemon.id}, **a['ability']}
             ).to_instance()
             abilities.append(ability)
@@ -70,5 +70,5 @@ class PokemonService:
                 self._db.close()
 
     def get_all_pokemons(self):
-        return [PokemonSchema.from_instance(i)
+        return [PokemonDTO.from_instance(i)
                 for i in self._db.query(Pokemon).all()]

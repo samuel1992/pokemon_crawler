@@ -6,13 +6,13 @@ from .model import Pokemon, Ability
 
 
 @dataclass
-class Schema:
+class DTO:
     def to_dict(self):
         return asdict(self)
 
 
 @dataclass
-class AbilitySchema(Schema):
+class AbilityDTO(DTO):
     instance_class = Ability
 
     id: Optional[int]
@@ -20,7 +20,7 @@ class AbilitySchema(Schema):
     pokemon_id: Optional[int] = None
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'AbilitySchema':
+    def from_dict(cls, data: dict) -> 'AbilityDTO':
         return cls(
             id=int(data['url'].split('/')[6]),
             name=data['name'],
@@ -28,7 +28,7 @@ class AbilitySchema(Schema):
         )
 
     @classmethod
-    def from_instance(cls, instance: Ability) -> 'AbilitySchema':
+    def from_instance(cls, instance: Ability) -> 'AbilityDTO':
         return cls(
             id=instance.id,
             name=instance.name,
@@ -40,26 +40,26 @@ class AbilitySchema(Schema):
 
 
 @dataclass
-class PokemonSchema(Schema):
+class PokemonDTO(DTO):
     instance_class = Pokemon
 
     id: Optional[int]
     name: str
-    abilities: Optional[List[AbilitySchema]] = field(
+    abilities: Optional[List[AbilityDTO]] = field(
         default_factory=lambda: []
     )
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'PokemonSchema':
+    def from_dict(cls, data: dict) -> 'PokemonDTO':
         return cls(
             id=int(data['url'].split('/')[6]),
             name=data['name']
         )
 
     @classmethod
-    def from_instance(cls, instance: Pokemon) -> 'PokemonSchema':
+    def from_instance(cls, instance: Pokemon) -> 'PokemonDTO':
         abilities = [
-            AbilitySchema.from_instance(i) for i in instance.abilities
+            AbilityDTO.from_instance(i) for i in instance.abilities
         ]
 
         return cls(
@@ -69,7 +69,7 @@ class PokemonSchema(Schema):
         )
 
     def to_instance(self):
-        abilities = [AbilitySchema.instance_class(**i.to_dict()) for i in self.abilities]
+        abilities = [AbilityDTO.instance_class(**i.to_dict()) for i in self.abilities]
         pokemon_data = self.to_dict()
         pokemon_data['abilities'] = abilities
         return self.instance_class(**pokemon_data)

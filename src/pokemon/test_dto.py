@@ -1,11 +1,11 @@
-from .schema import AbilitySchema, PokemonSchema
+from .dto import AbilityDTO, PokemonDTO
 from .model import Pokemon, Ability
 
 from fixtures import db
 
 
 def teste_create_a_ability_schema():
-    ability_schema = AbilitySchema(id=1, name='test')
+    ability_schema = AbilityDTO(id=1, name='test')
 
     assert ability_schema.to_dict() == {
         'id': 1,
@@ -15,7 +15,7 @@ def teste_create_a_ability_schema():
 
 
 def test_create_a_pokemon_schema():
-    pokemon_schema = PokemonSchema(id=1, name='test')
+    pokemon_schema = PokemonDTO(id=1, name='test')
 
     assert pokemon_schema.to_dict() == {
         'id': 1,
@@ -25,9 +25,9 @@ def test_create_a_pokemon_schema():
 
 
 def test_create_a_pokemon_schema_with_abilities():
-    ability_schema1 = AbilitySchema(id=1, name='test1', pokemon_id=1)
-    ability_schema2 = AbilitySchema(id=2, name='test2', pokemon_id=1)
-    pokemon_schema = PokemonSchema(
+    ability_schema1 = AbilityDTO(id=1, name='test1', pokemon_id=1)
+    ability_schema2 = AbilityDTO(id=2, name='test2', pokemon_id=1)
+    pokemon_schema = PokemonDTO(
         id=1,
         name='test',
         abilities=[ability_schema1, ability_schema2]
@@ -53,7 +53,7 @@ def test_create_a_pokemon_schema_with_abilities():
 
 def test_create_ability_schema_from_an_instance(db):
     ability = Ability(id=1, name='test')
-    ability_schema = AbilitySchema.from_instance(ability)
+    ability_schema = AbilityDTO.from_instance(ability)
 
     assert ability_schema.to_dict() == {
         'id': ability.id,
@@ -64,7 +64,7 @@ def test_create_ability_schema_from_an_instance(db):
 
 def test_create_pokemon_schema_from_an_instance(db):
     pokemon = Pokemon(id=1, name='test name')
-    pokemon_schema = PokemonSchema.from_instance(pokemon)
+    pokemon_schema = PokemonDTO.from_instance(pokemon)
 
     assert pokemon_schema.to_dict() == {
         'id': pokemon.id,
@@ -79,7 +79,7 @@ def test_create_pokemon_schema_with_abilities_from_instance(db):
     pokemon = Pokemon(id=1, name='test pokemon')
     pokemon.add_abilities([ability1, ability2])
 
-    pokemon_schema = PokemonSchema.from_instance(pokemon)
+    pokemon_schema = PokemonDTO.from_instance(pokemon)
 
     assert pokemon_schema.to_dict() == {
         'id': 1,
@@ -100,9 +100,9 @@ def test_create_pokemon_schema_with_abilities_from_instance(db):
 
 
 def test_pokemon_schema_to_instance():
-    ability_schema1 = AbilitySchema(id=1, name='test1', pokemon_id=1)
-    ability_schema2 = AbilitySchema(id=2, name='test2', pokemon_id=1)
-    pokemon_schema = PokemonSchema(
+    ability_schema1 = AbilityDTO(id=1, name='test1', pokemon_id=1)
+    ability_schema2 = AbilityDTO(id=2, name='test2', pokemon_id=1)
+    pokemon_schema = PokemonDTO(
         id=1,
         name='test',
         abilities=[ability_schema1, ability_schema2]
@@ -111,7 +111,7 @@ def test_pokemon_schema_to_instance():
 
 
 def test_ability_schema_to_instance():
-    ability_schema = AbilitySchema(id=1, name='test1', pokemon_id=1)
+    ability_schema = AbilityDTO(id=1, name='test1', pokemon_id=1)
 
     assert isinstance(ability_schema.to_instance(), Ability)
 
@@ -121,7 +121,7 @@ def test_pokemon_schema_from_dict():
         'name': 'rattata',
         'url': 'https://pokeapi.co/api/v2/pokemon/19/'
     }
-    pokemon_schema = PokemonSchema.from_dict(data)
+    pokemon_schema = PokemonDTO.from_dict(data)
 
     assert pokemon_schema.id == 19
     assert pokemon_schema.name == 'rattata'
@@ -132,7 +132,7 @@ def test_hability_schema_from_dict():
         'name': 'overgrow',
         'url': 'https://pokeapi.co/api/v2/ability/65/'
     }
-    ability_schema = AbilitySchema.from_dict(data)
+    ability_schema = AbilityDTO.from_dict(data)
 
     assert ability_schema.id == 65
     assert ability_schema.name == 'overgrow'
