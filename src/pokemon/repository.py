@@ -33,7 +33,7 @@ class PokemonRepository:
         if pokemon_dto.id is None:
             return None
 
-        self.storage.update(self.entity, pokemon_dto.to_dict())
+        self.storage.update(pokemon_dto.to_instance())
         return self.get_by_id(pokemon_dto.id)
 
 
@@ -66,5 +66,5 @@ class AbilityRepository:
         if ability_dto.id is None:
             return None
 
-        self.storage.update(self.entity, ability_dto.to_dict())
+        self.storage.update(ability_dto.to_instance())
         return self.get_by_id(ability_dto.id)

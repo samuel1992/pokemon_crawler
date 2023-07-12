@@ -60,15 +60,8 @@ class PostgresStorage(Storage):
 
         return item_id
 
-    def update(self, item_class, new_data: dict):
-        item_id = new_data.get('id')
-        if item_id is None:
-            return
-
-        self.db_engine.query(item_class).filter(
-            item_class.id == item_id
-        ).update(new_data)
-
+    def update(self, item):
+        self.db_engine.merge(item)
         self.db_engine.commit()
         self.db_engine.close()
 

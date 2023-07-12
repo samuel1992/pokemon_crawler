@@ -50,9 +50,8 @@ def test_update_a_pokemon(db):
     first_pokemon = db.query(Pokemon).first()
     assert first_pokemon is not None
 
-    storage.update(
-        Pokemon, dict(id=1, name='New pokemon name', last_update=datetime.now())
-    )
+    pokemon = Pokemon(id=1, name='New pokemon name', last_update=datetime.now())
+    storage.update(pokemon)
 
     first_pokemon = db.query(Pokemon).first()
     assert first_pokemon.name != initial_name
