@@ -23,7 +23,7 @@ class PokemonRepository:
         return [PokemonDTO.from_instance(i) for i in instances]
 
     def create(self, pokemon_dto: PokemonDTO) -> Optional[PokemonDTO]:
-        id = self.storage.create(pokemon_dto.to_instance)
+        id = self.storage.create(pokemon_dto.to_instance())
         if id is None:
             return None
 
@@ -56,7 +56,7 @@ class AbilityRepository:
         return self.storage.count(self.entity)
 
     def create(self, ability_dto: AbilityDTO) -> Optional[AbilityDTO]:
-        id = self.storage.create(ability_dto.to_instance)
+        id = self.storage.create(ability_dto.to_instance())
         if id is None:
             return None
 
