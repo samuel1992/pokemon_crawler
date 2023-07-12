@@ -4,6 +4,8 @@ from typing import Optional
 import sqlalchemy
 from sqlalchemy import desc
 
+from extensions import db
+
 
 class Storage(ABC):
     @abstractmethod
@@ -12,6 +14,10 @@ class Storage(ABC):
 
     @abstractmethod
     def get_by_id(self, item_id):
+        pass
+
+    @abstractmethod
+    def get_by(self, item, field, value):
         pass
 
     @abstractmethod
@@ -32,18 +38,22 @@ class Storage(ABC):
     def count(self, item):
         pass
 
+    @abstractmethod
+    def rollback(self):
+        pass
+
 
 class PostgresStorage(Storage):
-    def __init__(self, db_engine):
-        self.db_engine = db_engine
+    def __init__(self, db_engine=None):
+        self.db_engine = db_engine or db
 
     def create(self, item) -> Optional[int]:
         try:
             self.db_engine.add(item)
             self.db_engine.commit()
-            self.db_engine.flush()
             item_id = item.id
         except sqlalchemy.exc.IntegrityError:
+            self.db_engine.rollback()
             return None
         finally:
             self.db_engine.close()
@@ -77,6 +87,14 @@ class PostgresStorage(Storage):
 
     def get_by_id(self, item_class, item_id):
         return self.db_engine.query(item_class).get(item_id)
+
+    def get_by(self, item_class, field, value):
+        return self.db_engine.query(item_class).filter(
+            getattr(item_class, field) == value
+        ).first()
+
+    def rollback(self):
+        self.db_engine.rollback()
 
     def delete(self, item_id: int):
         pass
