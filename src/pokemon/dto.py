@@ -44,7 +44,7 @@ class PokemonDTO(DTO):
     abilities: Optional[List[AbilityDTO]] = field(
         default_factory=lambda: []
     )
-    last_update: Optional[datetime]
+    last_update: Optional[datetime] = datetime.now()
 
     @classmethod
     def from_dict(cls, data: dict) -> 'PokemonDTO':
@@ -62,7 +62,8 @@ class PokemonDTO(DTO):
         return cls(
             id=instance.id,
             name=instance.name,
-            abilities=abilities
+            abilities=abilities,
+            last_update=instance.last_update
         )
 
     def to_instance(self):

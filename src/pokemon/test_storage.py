@@ -4,7 +4,7 @@ from datetime import datetime
 
 from fixtures import db
 
-from .model import Pokemon
+from .model import Pokemon, Ability
 from .storage import PostgresStorage
 
 
@@ -111,3 +111,19 @@ def test_get_pokemon_by_id(db):
     db.commit()
 
     assert pokemon == storage.get_by_id(Pokemon, 1)
+
+
+def test_get_ability_by_name(db):
+    storage = PostgresStorage(db_engine=db)
+    ability = Ability(id=1, name='test')
+
+    db.add(ability)
+    db.commit()
+
+    result = storage.get_by(Ability, 'name', 'test')
+
+    assert result is not None
+    assert result.name == 'test'
+
+    result = storage.get_by(Ability, 'name', 'nonexistent')
+    assert result is None

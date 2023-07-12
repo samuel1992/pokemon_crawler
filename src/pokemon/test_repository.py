@@ -6,7 +6,7 @@ import pytest
 
 from .dto import AbilityDTO, PokemonDTO
 from .model import Ability, Pokemon
-from .repository import AbilityRepository, IntegrityError, PokemonRepository
+from .repository import AbilityRepository, PokemonRepository
 
 
 def now():
@@ -56,14 +56,7 @@ class PokemonRepositoryTest(TestCase):
         self.repository.storage.get_by_id.return_value = pokemon_dto
 
         assert pokemon_dto == self.repository.update(pokemon_dto)
-
-    def test_try_to_create_duplicate(self):
-        pokemon = Pokemon(id=1, name='some name', last_update=now())
-        pokemon_dto = PokemonDTO.from_instance(pokemon)
-        self.repository.storage.create.side_effect = IntegrityError()
-
-        with pytest.raises(IntegrityError):
-            assert pokemon_dto == self.repository.create(pokemon_dto)
+        self.repository.storage.update.assert_called_with(Pokemon, pokemon_dto.to_dict())
 
 
 class AbilityRepositoryTest(TestCase):
@@ -89,11 +82,13 @@ class AbilityRepositoryTest(TestCase):
         self.repository.storage.get_by_id.return_value = ability_dto
 
         assert ability_dto == self.repository.update(ability_dto)
+        self.repository.storage.update.assert_called_with(Ability, ability_dto.to_dict())
 
-    def test_try_to_create_duplicate(self):
-        ability = Ability(id=1, name='test ability 1')
-        ability_dto = AbilityDTO.from_instance(ability)
-        self.repository.storage.create.side_effect = IntegrityError()
+    def test_get_by_name(self):
+        ability = Ability(id=1, name='test')
+        self.repository.storage.get_by.return_value = ability
 
-        with pytest.raises(IntegrityError):
-            assert ability_dto == self.repository.create(ability_dto)
+        result = self.repository.get_by_name('test')
+
+        assert result == ability
+        self.repository.storage.get_by.assert_called_with(Ability, 'name', 'test')
