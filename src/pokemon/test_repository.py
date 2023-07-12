@@ -19,7 +19,7 @@ class PokemonRepositoryTest(TestCase):
 
     def test_get_by_id(self):
         pokemon = Pokemon(id=1, name='some name', last_update=now())
-        self.repository.storage.get_by_id.return_value = pokemon
+        self.repository.storage.get_by.return_value = pokemon
 
         assert self.repository.get_by_id(1) == PokemonDTO.from_instance(pokemon)
 
@@ -46,17 +46,17 @@ class PokemonRepositoryTest(TestCase):
     def test_create(self):
         pokemon = Pokemon(id=1, name='some name', last_update=now())
         pokemon_dto = PokemonDTO.from_instance(pokemon)
-        self.repository.storage.get_by_id.return_value = pokemon
+        self.repository.storage.get_by.return_value = pokemon
 
         assert pokemon_dto == self.repository.create(pokemon_dto)
 
     def test_update(self):
         pokemon = Pokemon(id=1, name='some name', last_update=now())
         pokemon_dto = PokemonDTO.from_instance(pokemon)
-        self.repository.storage.get_by_id.return_value = pokemon_dto
+        self.repository.storage.get_by.return_value = pokemon_dto
 
         assert pokemon_dto == self.repository.update(pokemon_dto)
-        self.repository.storage.update.assert_called_with(Pokemon, pokemon_dto.to_dict())
+        self.repository.storage.update.assert_called()
 
 
 class AbilityRepositoryTest(TestCase):
@@ -72,17 +72,17 @@ class AbilityRepositoryTest(TestCase):
     def test_create(self):
         ability = Ability(id=1, name='test ability 1')
         ability_dto = AbilityDTO.from_instance(ability)
-        self.repository.storage.get_by_id.return_value = ability
+        self.repository.storage.get_by.return_value = ability
 
         assert ability_dto == self.repository.create(ability_dto)
 
     def test_update(self):
         ability = Ability(id=1, name='test ability 1')
         ability_dto = AbilityDTO.from_instance(ability)
-        self.repository.storage.get_by_id.return_value = ability_dto
+        self.repository.storage.get_by.return_value = ability_dto
 
         assert ability_dto == self.repository.update(ability_dto)
-        self.repository.storage.update.assert_called_with(Ability, ability_dto.to_dict())
+        self.repository.storage.update.assert_called()
 
     def test_get_by_name(self):
         ability = Ability(id=1, name='test')

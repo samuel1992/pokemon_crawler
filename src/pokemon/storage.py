@@ -13,10 +13,6 @@ class Storage(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, item_id):
-        pass
-
-    @abstractmethod
     def get_by(self, item, field, value):
         pass
 
@@ -77,9 +73,6 @@ class PostgresStorage(Storage):
 
     def count(self, item_class) -> int:
         return self.db_engine.query(item_class).count()
-
-    def get_by_id(self, item_class, item_id):
-        return self.db_engine.query(item_class).get(item_id)
 
     def get_by(self, item_class, field, value):
         return self.db_engine.query(item_class).filter(

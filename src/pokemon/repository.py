@@ -9,7 +9,7 @@ class PokemonRepository:
         self.entity = entity
 
     def get_by_id(self, id: int) -> Optional[PokemonDTO]:
-        instance = self.storage.get_by_id(self.entity, id)
+        instance = self.storage.get_by(self.entity, 'id', id)
         if instance is None:
             return None
 
@@ -43,7 +43,7 @@ class AbilityRepository:
         self.entity = entity
 
     def get_by_id(self, id: int) -> Optional[AbilityDTO]:
-        instance = self.storage.get_by_id(self.entity, id)
+        instance = self.storage.get_by(self.entity, 'id', id)
         if instance is None:
             return None
 
