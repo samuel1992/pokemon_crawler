@@ -5,33 +5,34 @@ import sqlalchemy
 from sqlalchemy import desc
 
 from extensions import db
+from lib.immudb_api import EQ, Comparison, ImmuDBClient, OrderBy, Query
 
 
 class Storage(ABC):
     @abstractmethod
-    def create(self, item) -> Optional[int]:
+    def create(self, dto) -> Optional[str]:
         pass
 
     @abstractmethod
-    def get_by(self, item, field, value):
+    def get_by(self, dto, field, value):
         pass
 
     @abstractmethod
     def get_all(
-        self, item, limit: Optional[int] = None, order_by: Optional[str] = None
+        self, dto, limit: Optional[int] = None, order_by: Optional[str] = None
     ):
         pass
 
     @abstractmethod
-    def update(self, item, new_data: dict):
+    def update(self, dto, new_data: dict):
         pass
 
     @abstractmethod
-    def delete(self, item_id):
+    def delete(self, dto):
         pass
 
     @abstractmethod
-    def count(self, item):
+    def count(self, dto):
         pass
 
     @abstractmethod
@@ -43,7 +44,7 @@ class PostgresStorage(Storage):
     def __init__(self, db_engine=None):
         self.db_engine = db_engine or db
 
-    def create(self, dto) -> Optional[int]:
+    def create(self, dto) -> Optional[str]:
         instance = dto.to_instance()
         try:
             self.db_engine.add(instance)
@@ -55,7 +56,7 @@ class PostgresStorage(Storage):
         finally:
             self.db_engine.close()
 
-        return item_id
+        return str(item_id)
 
     def update(self, dto):
         instance = dto.to_instance()
@@ -88,29 +89,50 @@ class PostgresStorage(Storage):
     def rollback(self):
         self.db_engine.rollback()
 
-    def delete(self, item_id: int):
+    def delete(self, dto):
         pass
 
 
 class ImmuDBStorage(Storage):
-    def create(self, item) -> Optional[int]:
-        pass
+    def __init__(self, immudb_client=None):
+        self.client = immudb_client or ImmuDBClient('')
 
-    def get_by(self, item, field, value):
-        pass
+    def create(self, dto) -> Optional[str]:
+        if hasattr(dto, 'last_update'):
+            dto.last_update = dto.last_update.strftime('%Y-%M-%d %H:%M:%S')
+
+        document = self.client.create_document(dto.to_dict())
+        return document.id
+
+    def get_by(self, dto, field, value):
+        comparison = Comparison(field=field, value=value)
+        query = Query(comparisons=[comparison])
+        result = self.client.search(query)
+        if result is not None:
+            dto.from_dict(result[0].data)
 
     def get_all(
-        self, item, limit: Optional[int] = None, order_by: Optional[str] = None
+        self, dto, limit: Optional[int] = None, order_by: Optional[str] = None
     ):
-        pass
+        query = Query()
+        result = self.client.search(query)
+        if result is not None:
+            return [dto.from_instance(i.data) for i in result]
 
-    def update(self, item, new_data: dict):
-        pass
+    def update(self, dto, new_data: dict):
+        if hasattr(dto, 'last_update'):
+            dto.last_update = dto.last_update.strftime('%Y-%M-%d %H:%M:%S')
+
+        comparison = Comparison(field='id', value=dto.id)
+        query = Query(comparisons=[comparison])
+        document = self.client.update_document(new_data, query)
+        return document.id
+
+    def count(self, item_id=None):
+        query = Query()
+        return self.client.count(query)
 
     def delete(self, item_id):
-        pass
-
-    def count(self, item):
         pass
 
     def rollback(self):

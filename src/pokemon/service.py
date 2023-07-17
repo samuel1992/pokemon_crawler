@@ -1,11 +1,13 @@
+import os
 from datetime import datetime
 from typing import List, Optional
 
 from lib.pokemon_api import PokemonApi
+from lib.immudb_api import ImmuDBClient
 
 from .dto import AbilityDTO, PokemonDTO
 from .repository import Repository
-from .storage import PostgresStorage
+from .storage import PostgresStorage, ImmuDBStorage
 
 
 class PokemonService:
@@ -14,12 +16,19 @@ class PokemonService:
         pokemon_repository: Optional[Repository] = None,
         ability_repository: Optional[Repository] = None
     ):
+        storage = ImmuDBStorage(
+            ImmuDBClient(
+                token=os.environ.get('IMMUDB_API_TOKEN', ''),
+                ledger='default',
+                collection='pokemons'
+            )
+        )
         self.pokemon_repository = pokemon_repository or Repository(
-            storage=PostgresStorage(),
+            storage=storage,
             dto_class=PokemonDTO
         )
         self.ability_repository = ability_repository or Repository(
-            storage=PostgresStorage(),
+            storage=storage,
             dto_class=AbilityDTO
         )
 

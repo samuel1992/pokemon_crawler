@@ -1,12 +1,15 @@
+from datetime import datetime
+from unittest import TestCase
+from unittest.mock import MagicMock
+
 import pytest
 
-from datetime import datetime
-
 from fixtures import db
+from lib.immudb_api import ImmuDBClient
 
-from .dto import PokemonDTO, AbilityDTO
-from .model import Pokemon, Ability
-from .storage import PostgresStorage, ImmuDBStorage
+from .dto import AbilityDTO, PokemonDTO
+from .model import Ability, Pokemon
+from .storage import ImmuDBStorage, PostgresStorage
 
 
 class TestPostgresStorage:
@@ -21,7 +24,6 @@ class TestPostgresStorage:
 
         assert first_pokemon is not None
         assert isinstance(first_pokemon, Pokemon)
-
 
     def test_create_a_duplicated_pokemon(self, db):
         storage = PostgresStorage(db_engine=db)
@@ -38,7 +40,6 @@ class TestPostgresStorage:
         duplicated_pokemon = PokemonDTO(id=1, name='new pokemon with used id', last_update=now)
 
         assert storage.create(duplicated_pokemon) is None
-
 
     def test_update_a_pokemon(self, db):
         initial_name = 'test pokemon'
@@ -59,7 +60,6 @@ class TestPostgresStorage:
         assert first_pokemon.name != initial_name
         assert first_pokemon.last_update != initial_update
 
-
     def test_get_all_pokemons(self, db):
         now = datetime.now()
         pokemon1 = Pokemon(id=1, name='some name', last_update=now)
@@ -75,7 +75,6 @@ class TestPostgresStorage:
 
         assert len(pokemons) == 2
 
-
     def test_get_all_pokemons_with_limit(self, db):
         now = datetime.now()
         for i in range(20):
@@ -90,7 +89,6 @@ class TestPostgresStorage:
 
         assert len(pokemons) == 10
 
-
     def test_count_pokemons(self, db):
         now = datetime.now()
         for i in range(10):
@@ -103,7 +101,6 @@ class TestPostgresStorage:
 
         assert storage.count(PokemonDTO) == 10
 
-
     def test_get_pokemon_by_id(self, db):
         storage = PostgresStorage(db_engine=db)
         pokemon = Pokemon(id=1, name='some name', last_update=datetime.now())
@@ -112,7 +109,6 @@ class TestPostgresStorage:
         db.commit()
 
         assert storage.get_by(PokemonDTO, 'id', 1)
-
 
     def test_get_ability_by_name(self, db):
         storage = PostgresStorage(db_engine=db)
@@ -130,27 +126,56 @@ class TestPostgresStorage:
         assert result is None
 
 
-class TestImmuDBStorage:
-    def test_create_a_pokemon(self):
-        pass
+class ImmuDBStorageTest(TestCase):
+    def setUp(self):
+        self.client_mock = MagicMock(spec=ImmuDBClient)
+        self.storage = ImmuDBStorage(immudb_client=self.client_mock)
 
-    def test_create_a_duplicated_pokemon(self):
-        pass
+    def test_create(self):
+        dto_mock = MagicMock()
+        dto_mock.to_dict.return_value = {'key': 'value'}
+        document_mock = MagicMock(id='document_id')
+        self.client_mock.create_document.return_value = document_mock
 
-    def test_update_a_pokemon(self):
-        pass
+        result = self.storage.create(dto_mock)
 
-    def test_get_all_pokemons(self):
-        pass
+        self.assertEqual(result, 'document_id')
+        self.client_mock.create_document.assert_called_with({'key': 'value'})
 
-    def test_get_all_pokemons_with_limit(self):
-        pass
+    def test_get_by(self):
+        dto_mock = MagicMock()
+        result_mock = MagicMock(data={'key': 'value'})
+        self.client_mock.search.return_value = [result_mock]
 
-    def test_count_pokemons(self):
-        pass
+        self.storage.get_by(dto_mock, 'field', 'value')
 
-    def test_get_pokemon_by_id(self):
-        pass
+        dto_mock.from_dict.assert_called_with({'key': 'value'})
 
-    def test_get_ability_by_name(self):
-        pass
+    def test_get_all(self):
+        dto_mock = MagicMock()
+        result_mock = MagicMock(data={'key': 'value'})
+        self.client_mock.search.return_value = [result_mock]
+
+        result = self.storage.get_all(dto_mock)
+
+        self.assertEqual(result, [dto_mock.from_instance.return_value])
+        self.client_mock.search.assert_called()
+
+    def test_update(self):
+        dto_mock = MagicMock(id='document_id')
+        dto_mock.to_dict.return_value = {'key': 'value'}
+        document_mock = MagicMock(id='updated_document_id')
+        self.client_mock.update_document.return_value = document_mock
+
+        result = self.storage.update(dto_mock, {'new_key': 'new_value'})
+
+        self.assertEqual(result, 'updated_document_id')
+        self.client_mock.update_document.assert_called()
+
+    def test_count(self):
+        self.client_mock.count.return_value = 5
+
+        result = self.storage.count()
+
+        self.assertEqual(result, 5)
+        self.client_mock.count.assert_called()

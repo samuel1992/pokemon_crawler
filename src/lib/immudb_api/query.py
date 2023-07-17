@@ -4,7 +4,7 @@ EQ = 'EQ'
 
 
 class Comparison:
-    def __init__(self, field: str, value: str = '', operator: str = ''):
+    def __init__(self, field: str, value: str = '', operator: str = EQ):
         assert field, 'Field is required'
 
         self.field = field
