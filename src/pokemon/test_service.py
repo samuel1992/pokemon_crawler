@@ -131,6 +131,6 @@ class TestPokemonService(TestCase):
         ids = self.service.last_updated_pokemons(1)
 
         assert len(ids) == 1
-        assert ids[0] == 1
+        assert ids[0] == '1'
 
         self.pokemon_repository.get_all.assert_called_with(1)

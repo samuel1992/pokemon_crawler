@@ -7,20 +7,25 @@ from .model import Ability, Pokemon
 
 @dataclass
 class DTO:
+    id: Optional[str]
+
     def to_dict(self):
         return asdict(self)
+
+    def __post_init__(self):
+        if self.id is not None:
+            self.id = str(self.id)
 
 
 @dataclass
 class AbilityDTO(DTO):
-    id: Optional[int]
     name: str
-    pokemon_id: Optional[int] = None
+    pokemon_id: Optional[str] = None
 
     @classmethod
     def from_dict(cls, data: dict) -> 'AbilityDTO':
         return cls(
-            id=int(data['url'].split('/')[6]),
+            id=str(data['url'].split('/')[6]),
             name=data['name'],
             pokemon_id=data.get('pokemon_id', None)
         )
@@ -28,7 +33,7 @@ class AbilityDTO(DTO):
     @classmethod
     def from_instance(cls, instance: Ability) -> 'AbilityDTO':
         return cls(
-            id=instance.id,
+            id=str(instance.id),
             name=instance.name,
             pokemon_id=instance.pokemon_id
         )
@@ -39,7 +44,6 @@ class AbilityDTO(DTO):
 
 @dataclass
 class PokemonDTO(DTO):
-    id: Optional[int]
     name: str
     abilities: Optional[List[AbilityDTO]] = field(
         default_factory=lambda: []
@@ -49,7 +53,7 @@ class PokemonDTO(DTO):
     @classmethod
     def from_dict(cls, data: dict) -> 'PokemonDTO':
         return cls(
-            id=int(data['url'].split('/')[6]),
+            id=str(data['url'].split('/')[6]),
             name=data['name']
         )
 
@@ -60,7 +64,7 @@ class PokemonDTO(DTO):
         ]
 
         return cls(
-            id=instance.id,
+            id=str(instance.id),
             name=instance.name,
             abilities=abilities,
             last_update=instance.last_update

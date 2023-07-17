@@ -109,7 +109,7 @@ def test_get_pokemon_by_id(db):
     db.add(pokemon)
     db.commit()
 
-    assert pokemon == storage.get_by_id(Pokemon, 1)
+    assert storage.get_by(Pokemon, 'id', 1)
 
 
 def test_get_ability_by_name(db):
