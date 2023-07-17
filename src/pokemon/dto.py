@@ -19,6 +19,8 @@ class DTO:
 
 @dataclass
 class AbilityDTO(DTO):
+    instance_class = Ability
+
     name: str
     pokemon_id: Optional[str] = None
 
@@ -44,6 +46,8 @@ class AbilityDTO(DTO):
 
 @dataclass
 class PokemonDTO(DTO):
+    instance_class = Pokemon
+
     name: str
     abilities: Optional[List[AbilityDTO]] = field(
         default_factory=lambda: []

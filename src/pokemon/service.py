@@ -1,30 +1,26 @@
 from datetime import datetime
 from typing import List, Optional
 
-import sqlalchemy
-
-from extensions import db
 from lib.pokemon_api import PokemonApi
 
 from .dto import AbilityDTO, PokemonDTO
-from .model import Ability, Pokemon
-from .repository import AbilityRepository, PokemonRepository
+from .repository import Repository
 from .storage import PostgresStorage
 
 
 class PokemonService:
     def __init__(
         self,
-        pokemon_repository: Optional[PokemonRepository] = None,
-        ability_repository: Optional[AbilityRepository] = None
+        pokemon_repository: Optional[Repository] = None,
+        ability_repository: Optional[Repository] = None
     ):
-        self.pokemon_repository = pokemon_repository or PokemonRepository(
+        self.pokemon_repository = pokemon_repository or Repository(
             storage=PostgresStorage(),
-            entity=Pokemon
+            dto_class=PokemonDTO
         )
-        self.ability_repository = ability_repository or AbilityRepository(
+        self.ability_repository = ability_repository or Repository(
             storage=PostgresStorage(),
-            entity=Ability
+            dto_class=AbilityDTO
         )
 
     def get_all_pokemons(self) -> List[PokemonDTO]:
@@ -52,7 +48,7 @@ class PokemonService:
                 self.pokemon_repository.create(pokemon)
 
     def fetch_new_abilities(self, pokemon_id: int):
-        pokemon_dto = self.pokemon_repository.get_by_id(pokemon_id)
+        pokemon_dto = self.pokemon_repository.get_by_id(str(pokemon_id))
         pokemon_dto.last_update = datetime.now()
         self.pokemon_repository.update(pokemon_dto)
 

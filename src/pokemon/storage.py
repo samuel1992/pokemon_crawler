@@ -43,11 +43,12 @@ class PostgresStorage(Storage):
     def __init__(self, db_engine=None):
         self.db_engine = db_engine or db
 
-    def create(self, item) -> Optional[int]:
+    def create(self, dto) -> Optional[int]:
+        instance = dto.to_instance()
         try:
-            self.db_engine.add(item)
+            self.db_engine.add(instance)
             self.db_engine.commit()
-            item_id = item.id
+            item_id = instance.id
         except sqlalchemy.exc.IntegrityError:
             self.db_engine.rollback()
             return None
@@ -56,31 +57,61 @@ class PostgresStorage(Storage):
 
         return item_id
 
-    def update(self, item):
-        self.db_engine.merge(item)
+    def update(self, dto):
+        instance = dto.to_instance()
+        self.db_engine.merge(instance)
         self.db_engine.commit()
         self.db_engine.close()
 
     def get_all(
-        self, item_class, limit: Optional[int] = None, order_by: Optional[str] = None
+        self, dto, limit: Optional[int] = None, order_by: Optional[str] = None
     ):
+        item_class = dto.instance_class
         query = self.db_engine.query(item_class)
 
         if order_by is not None:
             query.order_by(desc(getattr(item_class, order_by)))
 
-        return [i for i in query.limit(limit).all()]
+        return [dto.from_instance(i) for i in query.limit(limit).all()]
 
-    def count(self, item_class) -> int:
+    def count(self, dto) -> int:
+        item_class = dto.instance_class
         return self.db_engine.query(item_class).count()
 
-    def get_by(self, item_class, field, value):
-        return self.db_engine.query(item_class).filter(
-            getattr(item_class, field) == value
+    def get_by(self, dto, field, value):
+        instance = self.db_engine.query(dto.instance_class).filter(
+            getattr(dto.instance_class, field) == value
         ).first()
+        if instance is not None:
+            return dto.from_instance(instance)
 
     def rollback(self):
         self.db_engine.rollback()
 
     def delete(self, item_id: int):
+        pass
+
+
+class ImmuDBStorage(Storage):
+    def create(self, item) -> Optional[int]:
+        pass
+
+    def get_by(self, item, field, value):
+        pass
+
+    def get_all(
+        self, item, limit: Optional[int] = None, order_by: Optional[str] = None
+    ):
+        pass
+
+    def update(self, item, new_data: dict):
+        pass
+
+    def delete(self, item_id):
+        pass
+
+    def count(self, item):
+        pass
+
+    def rollback(self):
         pass
