@@ -47,7 +47,7 @@ def test_query_with_comparisons():
         'keepOpen': True,
         'query': {
             'expressions': [
-                comparison.to_dict()
+                { 'fieldComparisons': [comparison.to_dict()] }
             ],
             'limit': 0
         },
@@ -64,7 +64,7 @@ def test_query_with_order_by():
         'keepOpen': True,
         'query': {
             'expressions': [
-                comparison.to_dict()
+                { 'fieldComparisons': [comparison.to_dict()] }
             ],
             'orderBy': [
                 order_by.to_dict()

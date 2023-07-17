@@ -55,7 +55,9 @@ class Query:
         }
 
         if self.comparisons is not None:
-            query['query']['expressions'] = [i.to_dict() for i in self.comparisons]
+            query['query']['expressions'] = [
+                {'fieldComparisons': [i.to_dict() for i in self.comparisons]}
+            ]
 
         if self.order_by is not None:
             query['query']['orderBy'] = [i.to_dict() for i in self.order_by]

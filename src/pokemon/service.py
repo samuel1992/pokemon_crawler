@@ -49,8 +49,8 @@ class PokemonService:
         return [i.id for i in result]
 
     def fetch_new_pokemons(self):
-        response = PokemonApi.get_all_pokemons()
-        pokemons = [PokemonDTO.from_dict(i) for i in response]
+        response = PokemonApi.get_all_pokemons(limit=100)
+        pokemons = [PokemonDTO.from_dict(i) for i in response][:50]
         for pokemon in pokemons:
             found = self.pokemon_repository.get_by_id(pokemon.id)
             if found is None:
