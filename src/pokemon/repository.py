@@ -18,8 +18,7 @@ class Repository:
         return self.storage.count(self.entity)
 
     def get_all(self, amount: Optional[int] = None):
-        instances = self.storage.get_all(self.entity, amount)
-        return [self.entity.from_instance(i) for i in instances]
+        return self.storage.get_all(self.entity, amount)
 
     def create(self, dto):
         id = self.storage.create(dto)

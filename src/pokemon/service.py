@@ -33,7 +33,7 @@ class PokemonService:
         )
 
     def get_all_pokemons(self) -> List[PokemonDTO]:
-        return [PokemonDTO.from_instance(i) for i in self.pokemon_repository.get_all()]
+        return self.pokemon_repository.get_all()
 
     def pokemon_total(self):
         return self.pokemon_repository.get_total()

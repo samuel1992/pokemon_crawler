@@ -49,9 +49,9 @@ class PokemonDTO(DTO):
     instance_class = Pokemon
 
     name: str
-    abilities: Optional[List[AbilityDTO]] = field(
-        default_factory=lambda: []
-    )
+    # abilities: Optional[List[AbilityDTO]] = field(
+    #     default_factory=lambda: []
+    # )
     last_update: Optional[datetime] = datetime.now()
 
     @classmethod
@@ -70,7 +70,7 @@ class PokemonDTO(DTO):
         return cls(
             id=str(instance.id),
             name=instance.name,
-            abilities=abilities,
+            # abilities=abilities,
             last_update=instance.last_update
         )
 
