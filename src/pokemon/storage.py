@@ -109,7 +109,10 @@ class ImmuDBStorage(Storage):
         query = Query(comparisons=[comparison])
         result = self.client.search(query)
         if result is not None and len(result) > 0:
-            dto.from_dict(result[0].data)
+            data = result[0].data
+            return dto(name=data['name'],
+                       id=data['id'],
+                       last_update=data['last_update'])
 
     def get_all(
         self, dto, limit: Optional[int] = None, order_by: Optional[str] = None
@@ -117,7 +120,10 @@ class ImmuDBStorage(Storage):
         query = Query()
         result = self.client.search(query)
         if result is not None:
-            return [dto.from_dict(i.data) for i in result]
+            return [
+                dto(name=i.data['name'], id=i.data['id'], last_update=i.data['last_update'])
+                for i in result
+            ]
 
     def update(self, dto, new_data: dict):
         if hasattr(dto, 'last_update'):

@@ -54,6 +54,7 @@ class PokemonService:
         for pokemon in pokemons:
             found = self.pokemon_repository.get_by_id(pokemon.id)
             if found is None:
+                pokemon.abilities = ''
                 self.pokemon_repository.create(pokemon)
 
     def fetch_new_abilities(self, pokemon_id: int):

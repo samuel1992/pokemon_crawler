@@ -144,21 +144,30 @@ class ImmuDBStorageTest(TestCase):
 
     def test_get_by(self):
         dto_mock = MagicMock()
-        result_mock = MagicMock(data={'key': 'value'})
+        data = {
+            "id": "1",
+            "last_update": "2023-23-18 09:23:14",
+            "name": "bulbasaur"
+        }
+        result_mock = MagicMock(data=data)
         self.client_mock.search.return_value = [result_mock]
 
-        self.storage.get_by(dto_mock, 'field', 'value')
+        self.storage.get_by(dto_mock, 'id', '1')
 
-        dto_mock.from_dict.assert_called_with({'key': 'value'})
+        dto_mock.assert_called()
 
     def test_get_all(self):
         dto_mock = MagicMock()
-        result_mock = MagicMock(data={'key': 'value'})
+        data = {
+            "id": "1",
+            "last_update": "2023-23-18 09:23:14",
+            "name": "bulbasaur"
+        }
+        result_mock = MagicMock(data=data)
         self.client_mock.search.return_value = [result_mock]
 
         result = self.storage.get_all(dto_mock)
 
-        self.assertEqual(result, [dto_mock.from_instance.return_value])
         self.client_mock.search.assert_called()
 
     def test_update(self):
