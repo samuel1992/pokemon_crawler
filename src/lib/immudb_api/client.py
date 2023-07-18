@@ -26,8 +26,12 @@ class ImmuDBClient:
             'Content-Type': 'application/json'
         }
 
-    def create_collection(self, name: str) -> Optional[str]:
-        raise NotImplementedError
+    def create_collection(self, specification: dict) -> bool:
+        endpoint = f'/ledger/{self.ledger}/collection/{self.collection}'
+        url = self.url + endpoint
+        requests.delete(url, headers=self.headers)
+        response = requests.put(url, headers=self.headers, json=specification)
+        return response.ok
 
     def create_document(self, document_data: dict) -> Optional[Document]:
         endpoint = f'/ledger/{self.ledger}/collection/{self.collection}/document'
