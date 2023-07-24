@@ -3,11 +3,10 @@ from datetime import datetime
 from typing import List, Optional
 
 from lib.pokemon_api import PokemonApi
-from lib.immudb_api import ImmuDBClient
 
 from .dto import AbilityDTO, PokemonDTO
 from .repository import Repository
-from .storage import PostgresStorage, ImmuDBStorage
+from .storage import PostgresStorage
 
 
 class PokemonService:
@@ -16,13 +15,7 @@ class PokemonService:
         pokemon_repository: Optional[Repository] = None,
         ability_repository: Optional[Repository] = None
     ):
-        storage = ImmuDBStorage(
-            ImmuDBClient(
-                token=os.environ.get('IMMUDB_API_TOKEN', ''),
-                ledger='default',
-                collection='pokemons'
-            )
-        )
+        storage = PostgresStorage()
         self.pokemon_repository = pokemon_repository or Repository(
             storage=storage,
             dto_class=PokemonDTO
@@ -50,7 +43,7 @@ class PokemonService:
 
     def fetch_new_pokemons(self):
         response = PokemonApi.get_all_pokemons(limit=100)
-        pokemons = [PokemonDTO.from_dict(i) for i in response][:50]
+        pokemons = [PokemonDTO.from_dict(i) for i in response]
         for pokemon in pokemons:
             found = self.pokemon_repository.get_by_id(pokemon.id)
             if found is None:

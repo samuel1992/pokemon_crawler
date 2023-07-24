@@ -26,8 +26,7 @@ services:
 
   celery_worker:
     build: .
-    # command: 'celery -A tasks.tasks.app worker -l INFO'
-    command: tail -f /dev/null
+    command: 'celery -A tasks.tasks.app worker -l INFO'
     depends_on:
       - db
       - redis
@@ -40,7 +39,6 @@ services:
       - DB_HOST=db
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CRAWLER_INTERVAL=90
-      - IMMUDB_API_TOKEN=
 
   web:
     build: .
@@ -57,7 +55,6 @@ services:
       - DB_PASSWORD=postgres
       - DB_HOST=db
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - IMMUDB_API_TOKEN=
 
   redis:
     image: redis:6-alpine

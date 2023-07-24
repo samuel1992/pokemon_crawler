@@ -5,7 +5,6 @@ import sqlalchemy
 from sqlalchemy import desc
 
 from extensions import db
-from lib.immudb_api import EQ, Comparison, ImmuDBClient, OrderBy, Query
 
 
 class Storage(ABC):
@@ -90,56 +89,4 @@ class PostgresStorage(Storage):
         self.db_engine.rollback()
 
     def delete(self, dto):
-        pass
-
-
-class ImmuDBStorage(Storage):
-    def __init__(self, immudb_client=None):
-        self.client = immudb_client or ImmuDBClient('')
-
-    def create(self, dto) -> Optional[str]:
-        if hasattr(dto, 'last_update'):
-            dto.last_update = dto.last_update.strftime('%Y-%M-%d %H:%M:%S')
-
-        document = self.client.create_document(dto.to_dict())
-        return document.id
-
-    def get_by(self, dto, field, value):
-        comparison = Comparison(field=field, value=value)
-        query = Query(comparisons=[comparison])
-        result = self.client.search(query)
-        if result is not None and len(result) > 0:
-            data = result[0].data
-            return dto(name=data['name'],
-                       id=data['id'],
-                       last_update=data['last_update'])
-
-    def get_all(
-        self, dto, limit: Optional[int] = None, order_by: Optional[str] = None
-    ):
-        query = Query()
-        result = self.client.search(query)
-        if result is not None:
-            return [
-                dto(name=i.data['name'], id=i.data['id'], last_update=i.data['last_update'])
-                for i in result
-            ]
-
-    def update(self, dto, new_data: dict):
-        if hasattr(dto, 'last_update'):
-            dto.last_update = dto.last_update.strftime('%Y-%M-%d %H:%M:%S')
-
-        comparison = Comparison(field='id', value=dto.id)
-        query = Query(comparisons=[comparison])
-        document = self.client.update_document(new_data, query)
-        return document.id
-
-    def count(self, item_id=None):
-        query = Query()
-        return self.client.count(query)
-
-    def delete(self, item_id):
-        pass
-
-    def rollback(self):
         pass

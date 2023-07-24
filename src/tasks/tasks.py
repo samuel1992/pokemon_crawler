@@ -6,8 +6,6 @@ from extensions import Base, engine
 
 from pokemon.service import PokemonService
 
-from lib.immudb_api.client import ImmuDBClient
-
 from .celery import app
 
 
@@ -23,42 +21,6 @@ app.conf.beat_schedule = {
 app.conf.timezone = 'UTC'
 
 
-def setup_collection():
-    specification = {
-        "fields": [
-            {
-                "name": "name",
-                "type": "STRING"
-            },
-            {
-                "name": "id",
-                "type": "STRING"
-            },
-            {
-                "name": "abilities",
-                "type": "STRING"
-            },
-            {
-                "name": "last_update",
-                "type": "STRING"
-            }
-        ],
-        "indexes": [
-            {
-                "fields": [
-                    "id"
-                ],
-                "isUnique": True
-            }
-        ]
-    }
-    ImmuDBClient(
-        token=os.environ.get('IMMUDB_API_TOKEN'),
-        ledger='default',
-        collection='default'
-    ).create_collection(specification)
-
-
 @app.task
 def get_new_abilities(pokemon_id: int):
     service = PokemonService()
@@ -69,12 +31,12 @@ def get_new_abilities(pokemon_id: int):
 
 @app.task(name='get_new_pokemons')
 def get_new_pokemons():
-    setup_collection()
-
+    from pokemon.model import Pokemon, Ability
+    Base.metadata.create_all(bind=engine)
     service = PokemonService()
     service.fetch_new_pokemons()
 
     logger.info(f'Total pokemons in db: {service.pokemon_total()}')
 
-    #for pokemon_id in service.last_updated_pokemons(10):
-    #    get_new_abilities.delay(pokemon_id)
+    for pokemon_id in service.last_updated_pokemons(10):
+        get_new_abilities.delay(pokemon_id)

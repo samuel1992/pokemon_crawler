@@ -53,12 +53,6 @@ Good to know:
 - CRAWLER_INTERVAL=30 # Represents the interval that the crawler will take until run the next task to sync the pokemons with the api
 ```
 
-If you're using ImmudDB cloud as a storage, you have to edit the `docker-compose` file and place your api token as the env variable  `IMMUDB_API_TOKEN`
-for the service `celery_worker`:
-  ```
-      - IMMUDB_API_TOKEN=default.zde5cgrM2_bOcFTlA6Z60A.6mUBfOEt0KuSOjIZ8ZTOUWdPVlVPNp1bXwP6zFFFUAD0jykx
-  ```
-
 # More about it ...
 - It has two async tasks; the main job is to retrieve pokemons from the api and update their abilities. For that, I use a service to not have to interact directly with
 the model.

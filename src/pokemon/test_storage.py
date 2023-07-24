@@ -5,11 +5,10 @@ from unittest.mock import MagicMock
 import pytest
 
 from fixtures import db
-from lib.immudb_api import ImmuDBClient
 
 from .dto import AbilityDTO, PokemonDTO
 from .model import Ability, Pokemon
-from .storage import ImmuDBStorage, PostgresStorage
+from .storage import PostgresStorage
 
 
 class TestPostgresStorage:
@@ -124,67 +123,3 @@ class TestPostgresStorage:
 
         result = storage.get_by(AbilityDTO, 'name', 'nonexistent')
         assert result is None
-
-
-class ImmuDBStorageTest(TestCase):
-    def setUp(self):
-        self.client_mock = MagicMock(spec=ImmuDBClient)
-        self.storage = ImmuDBStorage(immudb_client=self.client_mock)
-
-    def test_create(self):
-        dto_mock = MagicMock()
-        dto_mock.to_dict.return_value = {'key': 'value'}
-        document_mock = MagicMock(id='document_id')
-        self.client_mock.create_document.return_value = document_mock
-
-        result = self.storage.create(dto_mock)
-
-        self.assertEqual(result, 'document_id')
-        self.client_mock.create_document.assert_called_with({'key': 'value'})
-
-    def test_get_by(self):
-        dto_mock = MagicMock()
-        data = {
-            "id": "1",
-            "last_update": "2023-23-18 09:23:14",
-            "name": "bulbasaur"
-        }
-        result_mock = MagicMock(data=data)
-        self.client_mock.search.return_value = [result_mock]
-
-        self.storage.get_by(dto_mock, 'id', '1')
-
-        dto_mock.assert_called()
-
-    def test_get_all(self):
-        dto_mock = MagicMock()
-        data = {
-            "id": "1",
-            "last_update": "2023-23-18 09:23:14",
-            "name": "bulbasaur"
-        }
-        result_mock = MagicMock(data=data)
-        self.client_mock.search.return_value = [result_mock]
-
-        result = self.storage.get_all(dto_mock)
-
-        self.client_mock.search.assert_called()
-
-    def test_update(self):
-        dto_mock = MagicMock(id='document_id')
-        dto_mock.to_dict.return_value = {'key': 'value'}
-        document_mock = MagicMock(id='updated_document_id')
-        self.client_mock.update_document.return_value = document_mock
-
-        result = self.storage.update(dto_mock, {'new_key': 'new_value'})
-
-        self.assertEqual(result, 'updated_document_id')
-        self.client_mock.update_document.assert_called()
-
-    def test_count(self):
-        self.client_mock.count.return_value = 5
-
-        result = self.storage.count()
-
-        self.assertEqual(result, 5)
-        self.client_mock.count.assert_called()
